@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import Top from './App';
+import {App} from './App';
 import reportWebVitals from './reportWebVitals';
 import {NextUIProvider} from "@nextui-org/react";
 
@@ -9,9 +9,7 @@ const root = ReactDOM.createRoot(document.getElementById('root')!);
 root.render(
   <React.StrictMode>
     <NextUIProvider>
-      <main className="dark">
-        <Top />
-      </main>
+      <App/>
     </NextUIProvider>
   </React.StrictMode>
 );
