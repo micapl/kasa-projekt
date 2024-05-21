@@ -1,9 +1,9 @@
-import { BrowserRouter, Route, Routes, createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 import WplatyPage from "./routes/wplaty";
 import WyplatyPage from "./routes/wyplaty";
 import InwentaryzacjaPage from "./routes/inwentaryzacja";
 import RaportyPage from "./routes/raporty";
-import { Top } from "./Top";
+import { Top } from "./NavbarTop";
 
 export const AppRouter = createBrowserRouter([
     {
