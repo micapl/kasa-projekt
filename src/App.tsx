@@ -5,121 +5,84 @@ import {
   NavbarItem,
   ButtonGroup,
   Button,
-  Checkbox,
+  Divider,
+  Switch,
 } from "@nextui-org/react";
-import React, { useState } from "react";
 import useDarkMode from "use-dark-mode";
 import AppRouter from "./app-router";
-import { Link } from "react-router-dom";
+import { BrowserRouter, NavLink, useLocation } from "react-router-dom";
+import { SunIcon } from "./images/SunIcon";
+import { MoonIcon } from "./images/MoonIcon";
 
-export const App = () =>{
-
+export const App = () => {
   const darkMode = useDarkMode(false);
-  return(
-    <main className={`${darkMode.value ? 'dark' : ''}`}>
-          <Top/>
-          <AppRouter/>
+  console.log(darkMode.value)
+  return (
+    <main className={`${darkMode.value ? "dark" : ""}`}>
+      <BrowserRouter>
+        <Top />
+        <AppRouter />
+      </BrowserRouter>
     </main>
-  )
- 
-}
-
-
-
+  );
+};
 
 export const Top = () => {
   const darkMode = useDarkMode(false);
-  const [Disabled1, setDisabled1] = useState(false);
-  const [Disabled2, setDisabled2] = useState(false);
-  const [Disabled3, setDisabled3] = useState(false);
-  const [Disabled4, setDisabled4] = useState(false);
-  function DisableMe(event: React.MouseEvent<HTMLButtonElement>) {
-    switch (event.currentTarget.id) {
-      case "Button1":
-        setDisabled1(true);
-        setDisabled2(false);
-        setDisabled3(false);
-        setDisabled4(false);
-        break;
-      case "Button2":
-        setDisabled1(false);
-        setDisabled2(true);
-        setDisabled3(false);
-        setDisabled4(false);
-        break;
-      case "Button3":
-        setDisabled1(false);
-        setDisabled2(false);
-        setDisabled3(true);
-        setDisabled4(false);
-        break;
-      case "Button4":
-        setDisabled1(false);
-        setDisabled2(false);
-        setDisabled3(false);
-        setDisabled4(true);
-        break;
-      default:
-        break;
-    }
-  }
-
   return (
     <Navbar>
       <NavbarBrand>
-        <p style={{ fontSize: 25 }} className="font-bold text-foreground">Kasa Simulejtor</p>
+        <p style={{ fontSize: 25 }} className="font-bold text-foreground">
+          Kasa Simulejtor
+        </p>
       </NavbarBrand>
       <NavbarContent className="lg:flex gap-4" justify="center">
         <NavbarItem>
           <ButtonGroup>
-            <Link to={'/wplaty'}>
             <Button
+              as={NavLink}
               color="secondary"
-              id="Button1"
               size="lg"
-              href="#"
               variant="shadow"
-              onClick={DisableMe}
-              isDisabled={Disabled1}
+              to="/wplaty"
+              isDisabled={useLocation().pathname == "/wplaty"}
             >
               Wpłaty
             </Button>
-            </Link>
             <Button
+              as={NavLink}
               color="secondary"
-              id="Button2"
               size="lg"
-              href="#"
               variant="shadow"
-              onClick={DisableMe}
-              isDisabled={Disabled2}
+              to="/wyplaty"
+              isDisabled={useLocation().pathname == "/wyplaty"}
             >
               Wypłaty
             </Button>
           </ButtonGroup>
         </NavbarItem>
+        <Divider orientation="vertical" />
         <NavbarItem>
           <Button
+            as={NavLink}
             color="secondary"
-            id="Button3"
             size="lg"
-            href="#"
             variant="shadow"
-            onClick={DisableMe}
-            isDisabled={Disabled3}
+            to="/inwentaryzacja"
+            isDisabled={useLocation().pathname == "/inwentaryzacja"}
           >
             Inwentaryzacja
           </Button>
         </NavbarItem>
+        <Divider orientation="vertical" />
         <NavbarItem className="lg:flex">
           <Button
+            as={NavLink}
             color="secondary"
-            id="Button4"
             size="lg"
-            href="#"
             variant="shadow"
-            onClick={DisableMe}
-            isDisabled={Disabled4}
+            to="/raporty"
+            isDisabled={useLocation().pathname == "/raporty"}
           >
             Raporty
           </Button>
@@ -127,12 +90,15 @@ export const Top = () => {
       </NavbarContent>
       <NavbarContent justify="end">
         <NavbarItem>
-          <Checkbox defaultSelected onValueChange={darkMode.toggle}></Checkbox>
+          <Switch  
+          onValueChange={darkMode.toggle} 
+          defaultSelected={!darkMode.value}
+          color="warning"
+          startContent={<SunIcon />}
+          endContent={<MoonIcon />}
+          ></Switch>
         </NavbarItem>
       </NavbarContent>
-      
     </Navbar>
   );
 };
-
-

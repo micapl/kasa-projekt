@@ -5,8 +5,6 @@ import InwentaryzacjaPage from "./routes/inwentaryzacja";
 import RaportyPage from "./routes/raporty";
 function AppRouter(){
     return(
-
-    <BrowserRouter>
     <Routes>
         <Route path="/wplaty" element={
             <WplatyPage/>
@@ -21,7 +19,6 @@ function AppRouter(){
             <RaportyPage/>
         }/>
     </Routes>
-    </BrowserRouter>
 
     )
 }
