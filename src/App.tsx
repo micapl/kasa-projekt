@@ -9,24 +9,16 @@ import {
 } from "@nextui-org/react";
 import React, { useState } from "react";
 import useDarkMode from "use-dark-mode";
-import {
-  createBrowserRouter,
-  Link,
-  RouterProvider,
-} from "react-router-dom";
-
+import AppRouter from "./app-router";
+import { Link } from "react-router-dom";
 
 export const App = () =>{
-  const router = createBrowserRouter([
-    {
-      path: "/",
-      element: <Top />,
-    },
-  ]);
+
   const darkMode = useDarkMode(false);
   return(
     <main className={`${darkMode.value ? 'dark' : ''}`}>
-          <RouterProvider router={router} />
+          <Top/>
+          <AppRouter/>
     </main>
   )
  
@@ -80,7 +72,7 @@ export const Top = () => {
       <NavbarContent className="lg:flex gap-4" justify="center">
         <NavbarItem>
           <ButtonGroup>
-            <Link to="">
+            <Link to={'/wplaty'}>
             <Button
               color="secondary"
               id="Button1"
