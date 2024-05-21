@@ -1,10 +1,39 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, createBrowserRouter } from "react-router-dom";
 import WplatyPage from "./routes/wplaty";
 import WyplatyPage from "./routes/wyplaty";
 import InwentaryzacjaPage from "./routes/inwentaryzacja";
 import RaportyPage from "./routes/raporty";
+import { Top } from "./Top";
+
+export const AppRouter = createBrowserRouter([
+    {
+      path: "/",
+      element: <Top/>,
+      children: [
+        {
+          path: "/wplaty",
+          element: <WplatyPage/>,
+        },
+        {
+            path: "/wyplaty",
+            element: <WyplatyPage/>,
+        },
+        {
+            path: "/inwentaryzacja",
+            element: <InwentaryzacjaPage/>,
+        },
+        {
+            path: "/raporty",
+            element: <RaportyPage/>,
+        },
+      ],
+    },
+  ]);
+
+/*
 function AppRouter(){
     return(
+        
     <Routes>
         <Route path="/wplaty" element={
             <WplatyPage/>
@@ -22,5 +51,5 @@ function AppRouter(){
 
     )
 }
-
+*/
 export default AppRouter

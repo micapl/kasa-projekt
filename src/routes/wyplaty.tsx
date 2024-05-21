@@ -1,6 +1,6 @@
 const WyplatyPage = () => {
     return(
-        <div>Test udany - wyplaty</div>
+        <div className={"flex-auto text-foreground bg-default-100 h-screen"}>Test udany - wyplaty</div>
     )
 }
 export default WyplatyPage

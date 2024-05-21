@@ -1,6 +1,10 @@
 const InwentaryzacjaPage = () => {
     return(
-        <div>Test udany - inwentaryzacja</div>
+        <div className={"flex-auto text-foreground bg-default-100 h-screen"}>Test udany - inwentaryzacja
+        
+        
+        
+        </div>
     )
 }
 export default InwentaryzacjaPage
