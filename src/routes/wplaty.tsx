@@ -4,15 +4,17 @@ import { Form } from "react-router-dom"
 const WplatyPage = () => {
     return(
       <Input
-        label="Search"
+        label="Kwota"
+        type={"number"}
         isClearable
         radius="lg"
+        endContent = {"PLN"}
         classNames={{
           label: "text-black/50 dark:text-white/90",
           input: [
+            "text-center",
             "bg-transparent",
             "text-black/90 dark:text-white/90",
-            "placeholder:text-default-700/50 dark:placeholder:text-white/60",
           ],
           innerWrapper: "bg-transparent",
           inputWrapper: [
@@ -28,7 +30,6 @@ const WplatyPage = () => {
             "!cursor-text",
           ],
         }}
-        placeholder="Type to search..."
       />
     )
 }
