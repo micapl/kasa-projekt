@@ -64,7 +64,8 @@ const WplatyPage = () => {
         onChange={maininputChangeHandler}
         label="Kwota"
         type={"number"}
-        isClearable
+        step={0.01}
+        defaultValue="0"
         radius="none"
         endContent={<span>PLN</span>}
         classNames={{
