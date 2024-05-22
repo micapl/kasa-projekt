@@ -18,13 +18,13 @@ export const Top = () => {
   const darkMode = useDarkMode();
   return (
     <>
-      <Navbar>
+      <Navbar position="static" className="lg:flex gap-4">
         <NavbarBrand>
           <p style={{ fontSize: 25 }} className="font-bold text-foreground">
             Kasa Simulejtor
           </p>
         </NavbarBrand>
-        <NavbarContent className="lg:flex gap-4" justify="center">
+        <NavbarContent justify="center">
           <NavbarItem>
             <ButtonGroup>
               <Button
@@ -63,7 +63,7 @@ export const Top = () => {
             </Button>
           </NavbarItem>
           <Divider orientation="vertical" />
-          <NavbarItem className="lg:flex">
+          <NavbarItem>
             <Button
               as={NavLink}
               color="secondary"
@@ -88,7 +88,7 @@ export const Top = () => {
           </NavbarItem>
         </NavbarContent>
       </Navbar>
-      <div className={"flex-initial grow-0 text-foreground bg-default-100 h-screen"}>
+      <div className={"flex-col flex-1 min-h-screen max-h-screen text-foreground bg-default-100 overflow-x-hidden overflow-y-auto"}>
 
         <Outlet />
 

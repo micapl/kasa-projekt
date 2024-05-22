@@ -12,7 +12,6 @@
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.23.1",
     "react-scripts": "^5.0.1",
-    "store2": "^2.14.3",
     "tailwindcss": "^3.4.3",
     "use-dark-mode": "^2.3.1",
     "web-vitals": "^2.1.4"
