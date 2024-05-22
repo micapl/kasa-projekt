@@ -88,7 +88,11 @@ export const Top = () => {
           </NavbarItem>
         </NavbarContent>
       </Navbar>
-      <Outlet />
+      <div className={"flex-initial grow-0 text-foreground bg-default-100 h-screen"}>
+
+        <Outlet />
+
+      </div>
     </>
   );
 };
