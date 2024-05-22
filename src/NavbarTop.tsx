@@ -11,9 +11,11 @@ import {
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { SunIcon } from "./images/SunIcon";
 import { MoonIcon } from "./images/MoonIcon";
-import { getdarkmode, toggledarkmode } from "./darkmodecontroller";
+import useDarkMode from "use-dark-mode";
+
 
 export const Top = () => {
+  const darkMode = useDarkMode();
   return (
     <>
       <Navbar>
@@ -77,8 +79,8 @@ export const Top = () => {
         <NavbarContent justify="end">
           <NavbarItem>
             <Switch
-              onValueChange={toggledarkmode()!}
-              defaultSelected={getdarkmode()}
+              onValueChange={darkMode.toggle}
+              defaultSelected={darkMode.value}
               color="warning"
               startContent={<SunIcon />}
               endContent={<MoonIcon />}

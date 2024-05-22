@@ -1,12 +1,13 @@
+import useDarkMode from "use-dark-mode";
 import AppRouter from "./app-router";
 import { RouterProvider } from "react-router-dom";
-import { getdarkmode } from "./darkmodecontroller";
+
 
 
 export const App = () => {
-  console.log(getdarkmode())
+  const darkMode = useDarkMode();
   return (
-    <main className={getdarkmode()? "dark": "light"}>
+    <main className={!darkMode.value ? 'dark' : ''}>
       <RouterProvider router={AppRouter}/>
     </main>
   );
