@@ -4,21 +4,21 @@ import { ChangeEventHandler, FormEvent, FormEventHandler, useState } from "react
 import { Form, useSubmit } from "react-router-dom"
 
 const disabledInputs : any = {
-  500:false,
-  200:false,
-  100:false,
-  50:false,
-  20:false,
-  10:false,
-  5:false,
-  2:false,
-  1:false,
-  0.5:false,
-  0.2:false,
-  0.1:false,
-  0.05:false,
-  0.02:false,
-  0.01:false,
+  500:true,
+  200:true,
+  100:true,
+   50:true,
+   20:true,
+   10:true,
+    5:true,
+    2:true,
+    1:true,
+  0.5:true,
+  0.2:true,
+  0.1:true,
+ 0.05:true,
+ 0.02:true,
+ 0.01:true,
 }
 
 const WplatyPage = () => {
