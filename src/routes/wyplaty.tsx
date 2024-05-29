@@ -1,6 +1,8 @@
 import { Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Divider, Spacer, Skeleton } from "@nextui-org/react";
+import axios from "axios";
 import { FormEvent, useState } from "react";
 import { Form } from "react-router-dom";
+import api from "../api";
 
 const disabledInputs : any = {
      500:true,
@@ -26,6 +28,21 @@ const WyplatyPage = () => {
       event.preventDefault();
       throw new Error("Function not implemented.")
     }
+    async function getKasaValues() {
+      try {
+        const response = await api.get('/fileaccess.php', {
+          params: {
+            ID: "state"
+          }
+        })
+
+        console.log(response.data);
+      } catch (error) {
+
+        console.error(error);
+      }
+    }
+    getKasaValues()
     function maininputChangeHandler(event: FormEvent<HTMLInputElement>){
         let currentNumber = Number(event.currentTarget.value)
         console.log(currentNumber)
