@@ -28,7 +28,14 @@ function createFile($file){
         fwrite($file,$str1."=0"."\n");
     }
 };
-
+function writeFileData($file,$data){
+    fseek($file,0);
+    foreach ($data as $key => $value) {
+        $str = $key."=".$value."\n";
+        fwrite($file,$str);
+    }
+    
+}
 
 function loadFileData($file){
     logger('debug',"Data load started");
@@ -43,6 +50,19 @@ function loadFileData($file){
     return json_encode($kasaArray);
 }
 
+function deposit($values, $file){
+    logger('debug',"Deposit started");
+    fseek($file,0);
+    $deposit = JSON_decode($values, true);
+    while (!feof($file)) {
+        $temp = explode("=",fgets($file));
+        if(!feof($file)){
+            $kasaArray[$temp[0]] = (string)((int)trim($temp[1])+(int)$deposit[$temp[0]]);
+        }
+    }
+    writeFileData($file,$kasaArray);
+    logger("operation","Deposit complete".$values);
+}
 
 if (feof($plik)){createFile($plik);
 }else{ logger("info","API request made.");}
@@ -52,8 +72,11 @@ switch ($_GET["ID"]) {
         echo(loadFileData($plik));
         break;
     
-    default:
-        # code...
+    case "deposit":
+        deposit($_GET["content"], $plik);
+        echo($_GET["content"]);
         break;
-}
+    default:
+        break;
+    }
 
