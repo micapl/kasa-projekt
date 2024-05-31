@@ -6,7 +6,9 @@ header("Access-Control-Allow-Methods: PUT, POST, GET, OPTIONS, DELETE");
 
 $plik = fopen('kasa.txt','c+');
 fgetc($plik);
-
+if (feof($plik)){
+    createFile($plik);
+}
 
 function logger($type,$message){
     date_default_timezone_set("Europe/Warsaw");
@@ -18,7 +20,7 @@ function logger($type,$message){
 
 
 function createFile($file){
-    logger('info',"Data file is empty, creating a new one.");
+    logger('warn',"Data file is empty, creating a new one.");
     for ($i=0; $i < 5 ; $i++) { 
         $str5 = 500/pow(10,$i);
         $str2 = 200/pow(10,$i);
@@ -50,6 +52,20 @@ function loadFileData($file){
     return json_encode($kasaArray);
 }
 
+function withdraw($values, $file){
+    logger('debug',"Withdraw started");
+    fseek($file,0);
+    $deposit = JSON_decode($values, true);
+    while (!feof($file)) {
+        $temp = explode("=",fgets($file));
+        if(!feof($file)){
+            $kasaArray[$temp[0]] = (string)((float)trim($temp[1])-(float)$deposit[$temp[0]]);
+        }
+    }
+    writeFileData($file,$kasaArray);
+    logger("operation","Withdraw complete".$values);
+}
+
 function deposit($values, $file){
     logger('debug',"Deposit started");
     fseek($file,0);
@@ -57,16 +73,15 @@ function deposit($values, $file){
     while (!feof($file)) {
         $temp = explode("=",fgets($file));
         if(!feof($file)){
-            $kasaArray[$temp[0]] = (string)((int)trim($temp[1])+(int)$deposit[$temp[0]]);
+            $kasaArray[$temp[0]] = (string)((float)trim($temp[1])+(float)$deposit[$temp[0]]);
         }
     }
     writeFileData($file,$kasaArray);
     logger("operation","Deposit complete".$values);
 }
 
-if (feof($plik)){createFile($plik);
-}else{ logger("info","API request made.");}
-
+if($_SERVER['REQUEST_METHOD'] != 'OPTIONS'){
+if(isset($_GET)){
 switch ($_GET["ID"]) {
     case 'state':
         echo(loadFileData($plik));
@@ -74,9 +89,13 @@ switch ($_GET["ID"]) {
     
     case "deposit":
         deposit($_GET["content"], $plik);
-        echo($_GET["content"]);
+        break;
+
+    case "withdraw":
+        withdraw($_GET["content"], $plik);
         break;
     default:
         break;
     }
-
+}
+}
