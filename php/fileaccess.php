@@ -39,6 +39,7 @@ function writeFileData($file,$data){
     
 }
 
+
 function loadFileData($file){
     logger('debug',"Data load started");
     fseek($file,0);
@@ -80,6 +81,28 @@ function deposit($values, $file){
     logger("operation","Deposit complete".$values);
 }
 
+function verify($values, $file){
+    logger('debug',"Verifying logical and physical kasa state");
+    fseek($file,0);
+    //values - fizyczny (uzytkownik nam podal), file - logiczny
+    $values = JSON_decode($values, true);
+    $physical = $logical = 0;
+    while (!feof($file)) {
+        $temp = explode("=",fgets($file));
+        if(!feof($file)){
+            $physical += $values[$temp[0]]*$temp[0];
+            $logical += $temp[1]*$temp[0];
+            $kasaArray[$temp[0]] = (string)($values[$temp[0]]-$temp[1]);
+        }
+    }
+    if ($physical-$logical != 0 ){
+        $kasaArray["diff"] = (string)($physical-$logical);
+        return(JSON_encode($kasaArray));
+    }else {
+        return(JSON_encode($kasaArray));
+    }
+}
+
 if($_SERVER['REQUEST_METHOD'] != 'OPTIONS'){
 if(isset($_GET)){
 switch ($_GET["ID"]) {
@@ -93,6 +116,10 @@ switch ($_GET["ID"]) {
 
     case "withdraw":
         withdraw($_GET["content"], $plik);
+        break;
+
+    case "verify":
+        echo(verify($_GET["content"], $plik));
         break;
     default:
         break;

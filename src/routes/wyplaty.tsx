@@ -1,4 +1,4 @@
-import { Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Divider, Spacer, Skeleton, CheckboxGroup, Checkbox, RadioGroup, Radio } from "@nextui-org/react";
+import { Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Divider, Spacer, Skeleton, RadioGroup, Radio } from "@nextui-org/react";
 import { FormEvent, useState, useEffect, ChangeEvent } from "react";
 import { Form } from "react-router-dom";
 import api from "../api";
@@ -39,8 +39,7 @@ const WyplatyPage = () => {
    0.02:0.0,
    0.01:0.0,
   })
-
-    const [selected, setSelected] = useState("automatic");
+    const [selected, setSelected] = useState("manual");
     const [rerender, setRerender] = useState(false);
 
     async function handleSubmit(event: FormEvent<HTMLFormElement>){
@@ -63,12 +62,64 @@ const WyplatyPage = () => {
           content:JSON.stringify(json)
         }
       });
-      console.log(res)
-      //if (res == "Done")
     }
 
     function maininputChangeHandler(event: ChangeEvent<HTMLInputElement>){
+      let inputelements = document.querySelectorAll("[id^='input-']");
       set_total(parseFloat(event.target.value))
+      let temptotal = parseFloat(event.target.value)
+      if(isNaN(temptotal)){
+        temptotal = 0;
+      }
+      let vals : any = {
+        500:0,
+        200:0,
+        100:0,
+         50:0,
+         20:0,
+         10:0,
+          5:0,
+          2:0,
+          1:0,
+        0.5:0,
+        0.2:0,
+        0.1:0,
+       0.05:0,
+       0.02:0,
+       0.01:0,
+      }
+      switch (selected) {
+        case "automatic-max":
+          var increments = [500,200,100,50,20,10,5,2,1,0.5,0.2,0.1,0.05,0.02,0.01]
+          for (let i = 0; i < increments.length; i++) {
+            const element = increments[i];
+            vals[element] = Math.floor(temptotal/element)
+            temptotal = parseFloat((temptotal - Math.floor(temptotal/element)*element).toFixed(2))
+          }
+     
+          
+          break;
+        case "automatic-min":
+          increments = [0.01,0.02,0.05,0.1,0.2,0.5,1,2,5,10,20,50,100,200,500]
+          for (let i = 0; i < increments.length; i++) {
+            const element = increments[i];
+            vals[element] = Math.floor(temptotal/element)
+            //@ts-ignore
+            if(vals[element] > inputelements[i].max){
+              //@ts-ignore
+              vals[element] = inputelements[i].max
+              //@ts-ignore
+              temptotal = temptotal - parseInt(inputelements[i].max)*element
+            }else{
+              temptotal = parseFloat((temptotal - Math.floor(temptotal/element)*element).toFixed(2))
+            }
+          }
+          break;
+        default:
+          break;
+      }
+    //console.log(vals)
+    set_inputs(vals)
     }
     function smallInputChangeHandler(event: ChangeEvent<HTMLInputElement>){
       let id= parseFloat(event.target.id.slice(6));
@@ -76,7 +127,7 @@ const WyplatyPage = () => {
       const newValues = {
         ...inputs,
         [id]: value
-    } 
+      } 
       set_inputs(newValues)
       calc_total(newValues) 
     }
@@ -255,6 +306,7 @@ const WyplatyPage = () => {
         value={total.toString()}
         max={sumValues.toFixed(2).toString()}
         radius="none"
+        min={0}
         endContent={<span>PLN</span>}
         classNames={{
           label: "text-black/50 dark:text-white/90",
@@ -285,12 +337,10 @@ const WyplatyPage = () => {
         value={selected}
         onValueChange={setSelected}
       >
-          <Spacer className="w-1/12"/> 
-         <Radio value="automatic-fair" color="success">Automatyczny - po równo</Radio>
          <Spacer className="w-1/12"/> 
          <Radio value="automatic-max" color="success">Automatyczny - najpierw największe</Radio>
          <Spacer className="w-1/12"/> 
-         <Radio value="automatic-min" color="success">Automatyczny - najpierw najmniejsze</Radio>
+         <Radio value="automatic-min" color="success">Automatyczny - najpierw najmniejsze (dokładność do największego nominału)</Radio>
          <Spacer className="w-1/12"/> 
          <Radio value="manual" color="success">Ręczny</Radio>
          <Spacer className="w-1/12"/> 
@@ -306,16 +356,16 @@ const WyplatyPage = () => {
       <TableBody>
         <TableRow key="1" >
           <TableCell><Input readOnly value={"500"} classNames={{ input: ["text-right"] }} isDisabled={selected.startsWith("automatic")} endContent={<span>PLN</span>}/></TableCell>
-          <TableCell><Input type="number" id={"input-500"} step={1} min={0} defaultValue={"0"} onChange={smallInputChangeHandler} isDisabled={selected.startsWith("automatic")} max={values[500]}/></TableCell>
+          <TableCell><Input type="number" id={"input-500"} step={1} min={0} value={inputs[500].toString()} onChange={smallInputChangeHandler} isDisabled={selected.startsWith("automatic")} max={values[500]}/></TableCell>
         </TableRow>
         <TableRow key="2">
         <TableCell><Input readOnly value={"200"} classNames={{ input: ["text-right"] }} isDisabled={selected.startsWith("automatic")} endContent={<span>PLN</span>}/></TableCell>
-          <TableCell><Input type="number" id={"input-200"} step={1} min={0} defaultValue={"0"} onChange={smallInputChangeHandler} isDisabled={selected.startsWith("automatic")} max={values[200]}/></TableCell>
+          <TableCell><Input type="number" id={"input-200"} step={1} min={0} value={inputs[200].toString()} onChange={smallInputChangeHandler} isDisabled={selected.startsWith("automatic")} max={values[200]}/></TableCell>
 
         </TableRow>
         <TableRow key="3">
           <TableCell><Input readOnly value={"100"} classNames={{ input: ["text-right"] }} isDisabled={selected.startsWith("automatic")} endContent={<span>PLN</span>}/></TableCell>
-          <TableCell><Input type="number" id={"input-100"} step={1} min={0} defaultValue={"0"} onChange={smallInputChangeHandler} isDisabled={selected.startsWith("automatic")} max={values[100]}/></TableCell>
+          <TableCell><Input type="number" id={"input-100"} step={1} min={0} value={inputs[100].toString()} onChange={smallInputChangeHandler} isDisabled={selected.startsWith("automatic")} max={values[100]}/></TableCell>
 
         </TableRow>
       </TableBody>
@@ -328,16 +378,16 @@ const WyplatyPage = () => {
       <TableBody>
         <TableRow key="1" >
           <TableCell><Input readOnly value={"50"} classNames={{ input: ["text-right"] }}  isDisabled={selected.startsWith("automatic")} endContent={<span>PLN</span>}/></TableCell>
-          <TableCell><Input type="number" step={1} id={"input-50"} min={0} defaultValue={"0"} onChange={smallInputChangeHandler} isDisabled={selected.startsWith("automatic")} max={values[50]}/></TableCell>
+          <TableCell><Input type="number" step={1} id={"input-50"} min={0} value={inputs[50].toString()} onChange={smallInputChangeHandler} isDisabled={selected.startsWith("automatic")} max={values[50]}/></TableCell>
         </TableRow>
         <TableRow key="2">
         <TableCell><Input readOnly value={"20"} classNames={{ input: ["text-right"] }} isDisabled={selected.startsWith("automatic")} endContent={<span>PLN</span>}/></TableCell>
-          <TableCell><Input type="number" step={1} id={"input-20"} min={0} defaultValue={"0"} onChange={smallInputChangeHandler} isDisabled={selected.startsWith("automatic")} max={values[20]}/></TableCell>
+          <TableCell><Input type="number" step={1} id={"input-20"} min={0} value={inputs[20].toString()} onChange={smallInputChangeHandler} isDisabled={selected.startsWith("automatic")} max={values[20]}/></TableCell>
 
         </TableRow>
         <TableRow key="3">
           <TableCell><Input readOnly value={"10"} classNames={{ input: ["text-right"] }} isDisabled={selected.startsWith("automatic")} endContent={<span>PLN</span>}/></TableCell>
-          <TableCell><Input type="number" step={1} id={"input-10"} min={0} defaultValue={"0"} onChange={smallInputChangeHandler} isDisabled={selected.startsWith("automatic")} max={values[10]}/></TableCell>
+          <TableCell><Input type="number" step={1} id={"input-10"} min={0} value={inputs[10].toString()} onChange={smallInputChangeHandler} isDisabled={selected.startsWith("automatic")} max={values[10]}/></TableCell>
         </TableRow>
       </TableBody>
     </Table>
@@ -349,16 +399,16 @@ const WyplatyPage = () => {
       <TableBody>
         <TableRow key="1" >
           <TableCell><Input readOnly value={"5"} classNames={{ input: ["text-right"] }} isDisabled={selected.startsWith("automatic")} endContent={<span>PLN</span>}/></TableCell>
-          <TableCell><Input type="number" step={1} id={"input-5"} min={0} defaultValue={"0"} onChange={smallInputChangeHandler} isDisabled={selected.startsWith("automatic")} max={values[5]}/></TableCell>
+          <TableCell><Input type="number" step={1} id={"input-5"} min={0} value={inputs[5].toString()} onChange={smallInputChangeHandler} isDisabled={selected.startsWith("automatic")} max={values[5]}/></TableCell>
         </TableRow>
         <TableRow key="2">
         <TableCell><Input readOnly value={"2"} classNames={{ input: ["text-right"] }} isDisabled={selected.startsWith("automatic")} endContent={<span>PLN</span>}/></TableCell>
-          <TableCell><Input type="number" step={1} id={"input-2"} min={0} defaultValue={"0"} onChange={smallInputChangeHandler} isDisabled={selected.startsWith("automatic")} max={values[2]}/></TableCell>
+          <TableCell><Input type="number" step={1} id={"input-2"} min={0} value={inputs[2].toString()} onChange={smallInputChangeHandler} isDisabled={selected.startsWith("automatic")} max={values[2]}/></TableCell>
 
         </TableRow>
         <TableRow key="3">
           <TableCell><Input readOnly value={"1"} classNames={{ input: ["text-right"] }} isDisabled={selected.startsWith("automatic")} endContent={<span>PLN</span>}/></TableCell>
-          <TableCell><Input type="number" step={1} id={"input-1"} min={0} defaultValue={"0"} onChange={smallInputChangeHandler} isDisabled={selected.startsWith("automatic")} max={values[1]}/></TableCell>
+          <TableCell><Input type="number" step={1} id={"input-1"} min={0} value={inputs[1].toString()} onChange={smallInputChangeHandler} isDisabled={selected.startsWith("automatic")} max={values[1]}/></TableCell>
         </TableRow>
       </TableBody>
     </Table>
@@ -370,16 +420,16 @@ const WyplatyPage = () => {
       <TableBody>
         <TableRow key="1" >
           <TableCell><Input readOnly value={"0.5"} classNames={{ input: ["text-right"] }} isDisabled={selected.startsWith("automatic")} endContent={<span>PLN</span>}/></TableCell>
-          <TableCell><Input type="number" step={1} id={"input-0.5"} min={0} defaultValue={"0"} onChange={smallInputChangeHandler} isDisabled={selected.startsWith("automatic")} max={values[0.5]}/></TableCell>
+          <TableCell><Input type="number" step={1} id={"input-0.5"} min={0} value={inputs[0.5].toString()} onChange={smallInputChangeHandler} isDisabled={selected.startsWith("automatic")} max={values[0.5]}/></TableCell>
         </TableRow>
         <TableRow key="2">
         <TableCell><Input readOnly value={"0,20"} classNames={{ input: ["text-right"] }} isDisabled={selected.startsWith("automatic")} endContent={<span>PLN</span>}/></TableCell>
-          <TableCell><Input type="number" step={1} id={"input-0.2"} min={0} defaultValue={"0"} onChange={smallInputChangeHandler} isDisabled={selected.startsWith("automatic")} max={values[0.2]}/></TableCell>
+          <TableCell><Input type="number" step={1} id={"input-0.2"} min={0} value={inputs[0.2].toString()} onChange={smallInputChangeHandler} isDisabled={selected.startsWith("automatic")} max={values[0.2]}/></TableCell>
 
         </TableRow>
         <TableRow key="3">
           <TableCell><Input readOnly value={"0,10"} classNames={{ input: ["text-right"] }} isDisabled={selected.startsWith("automatic")} endContent={<span>PLN</span>}/></TableCell>
-          <TableCell><Input type="number" step={1} id={"input-0.1"}min={0} defaultValue={"0"} onChange={smallInputChangeHandler} isDisabled={selected.startsWith("automatic")} max={values[0.1]}/></TableCell>
+          <TableCell><Input type="number" step={1} id={"input-0.1"}min={0} value={inputs[0.1].toString()} onChange={smallInputChangeHandler} isDisabled={selected.startsWith("automatic")} max={values[0.1]}/></TableCell>
         </TableRow>
       </TableBody>
     </Table>
@@ -391,16 +441,16 @@ const WyplatyPage = () => {
       <TableBody>
         <TableRow key="1" >
           <TableCell><Input readOnly value={"0,05"} classNames={{ input: ["text-right"] }} isDisabled={selected.startsWith("automatic")} endContent={<span>PLN</span>}/></TableCell>
-          <TableCell><Input type="number" step={1} id={"input-0.05"} min={0} defaultValue={"0"} onChange={smallInputChangeHandler} isDisabled={selected.startsWith("automatic")} max={values[0.05]}/></TableCell>
+          <TableCell><Input type="number" step={1} id={"input-0.05"} min={0} value={inputs[0.05].toString()} onChange={smallInputChangeHandler} isDisabled={selected.startsWith("automatic")} max={values[0.05]}/></TableCell>
         </TableRow>
         <TableRow key="2">
         <TableCell><Input readOnly value={"0,02"} classNames={{ input: ["text-right"] }} isDisabled={selected.startsWith("automatic")} endContent={<span>PLN</span>}/></TableCell>
-          <TableCell><Input type="number" step={1} id={"input-0.02"} min={0} defaultValue={"0"} onChange={smallInputChangeHandler} isDisabled={selected.startsWith("automatic")} max={values[0.02]}/></TableCell>
+          <TableCell><Input type="number" step={1} id={"input-0.02"} min={0} value={inputs[0.02].toString()} onChange={smallInputChangeHandler} isDisabled={selected.startsWith("automatic")} max={values[0.02]}/></TableCell>
 
         </TableRow>
         <TableRow key="3">
           <TableCell><Input readOnly value={"0,01"} classNames={{ input: ["text-right"] }} isDisabled={selected.startsWith("automatic")} endContent={<span>PLN</span>}/></TableCell>
-          <TableCell><Input type="number" step={1} id={"input-0.01"} min={0} defaultValue={"0"} onChange={smallInputChangeHandler} isDisabled={selected.startsWith("automatic")} max={values[0.01]}/></TableCell>
+          <TableCell><Input type="number" step={1} id={"input-0.01"} min={0} value={inputs[0.01].toString()} onChange={smallInputChangeHandler} isDisabled={selected.startsWith("automatic")} max={values[0.01]}/></TableCell>
         </TableRow>
       </TableBody>
     </Table>

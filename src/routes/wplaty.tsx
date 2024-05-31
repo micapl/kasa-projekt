@@ -1,8 +1,6 @@
-import { Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Divider, input, Button} from "@nextui-org/react"
-import axios, { formToJSON } from "axios"
-import { useForceUpdate } from "framer-motion"
-import { ChangeEvent, ChangeEventHandler, FormEvent, FormEventHandler, useState } from "react"
-import { Form, useSubmit } from "react-router-dom"
+import { Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell} from "@nextui-org/react"
+import { ChangeEvent, FormEvent, useState } from "react"
+import { Form } from "react-router-dom"
 import api from "../api"
 const WplatyPage = () => {
   const [rerender, setRerender] = useState(false);
