@@ -30,6 +30,7 @@ function createFile($file){
         fwrite($file,$str1."=0"."\n");
     }
 };
+
 function writeFileData($file,$data){
     fseek($file,0);
     foreach ($data as $key => $value) {
@@ -41,7 +42,6 @@ function writeFileData($file,$data){
 
 
 function loadFileData($file){
-    logger('debug',"Data load started");
     fseek($file,0);
     while (!feof($file)) {
         $temp = explode("=",fgets($file));
@@ -64,11 +64,12 @@ function withdraw($values, $file){
         }
     }
     writeFileData($file,$kasaArray);
-    logger("operation","Withdraw complete".$values);
+    if(!isset($_GET["Mode"])){
+        logger("operation","Withdraw complete".$values);
+    }
 }
 
 function deposit($values, $file){
-    logger('debug',"Deposit started");
     fseek($file,0);
     $deposit = JSON_decode($values, true);
     while (!feof($file)) {
@@ -78,7 +79,10 @@ function deposit($values, $file){
         }
     }
     writeFileData($file,$kasaArray);
-    logger("operation","Deposit complete".$values);
+    if(!isset($_GET["Mode"])){
+        logger("operation","Deposit complete".$values);
+    }
+   
 }
 
 function verify($values, $file){
@@ -95,12 +99,9 @@ function verify($values, $file){
             $kasaArray[$temp[0]] = (string)($values[$temp[0]]-$temp[1]);
         }
     }
-    if ($physical-$logical != 0 ){
-        $kasaArray["diff"] = (string)($physical-$logical);
-        return(JSON_encode($kasaArray));
-    }else {
-        return(JSON_encode($kasaArray));
-    }
+    $kasaArray["diff"] = (string)($physical-$logical);
+    return(JSON_encode($kasaArray));
+
 }
 
 if($_SERVER['REQUEST_METHOD'] != 'OPTIONS'){
@@ -120,6 +121,9 @@ switch ($_GET["ID"]) {
 
     case "verify":
         echo(verify($_GET["content"], $plik));
+        break;
+    case "set":
+        writeFileData($plik,JSON_decode($_GET["content"],true));
         break;
     default:
         break;

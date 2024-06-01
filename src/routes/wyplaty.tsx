@@ -91,10 +91,24 @@ const WyplatyPage = () => {
       switch (selected) {
         case "automatic-max":
           var increments = [500,200,100,50,20,10,5,2,1,0.5,0.2,0.1,0.05,0.02,0.01]
+          
           for (let i = 0; i < increments.length; i++) {
             const element = increments[i];
             vals[element] = Math.floor(temptotal/element)
-            temptotal = parseFloat((temptotal - Math.floor(temptotal/element)*element).toFixed(2))
+            //@ts-expect-error
+            if(vals[element] > inputelements[i].max){
+              //@ts-ignore
+              vals[element] = inputelements[i].max
+              //@ts-ignore
+              temptotal = temptotal - parseInt(inputelements[i].max)*element
+            }else{
+              temptotal = parseFloat((temptotal - Math.floor(temptotal/element)*element).toFixed(2))
+
+            }
+          }
+          while (temptotal>0){
+            temptotal = (temptotal - 0.01)
+            vals[0.01] += 1 
           }
      
           

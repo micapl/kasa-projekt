@@ -1,14 +1,15 @@
-import { Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, useDisclosure, Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Textarea } from "@nextui-org/react";
-import { useState, FormEvent, ChangeEvent } from "react";
+import { Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, useDisclosure, Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Textarea, Chip, Card, CardBody } from "@nextui-org/react";
+import { useState, FormEvent, ChangeEvent, MouseEvent, MouseEventHandler } from "react";
 import { Form } from "react-router-dom";
 import api from "../api";
 import useDarkMode from "use-dark-mode";
 
 const InwentaryzacjaPage = () => {
+  const [json,set_json] = useState()
   const darkMode = useDarkMode();
   const {isOpen, onOpen, onOpenChange} = useDisclosure();
-  const [total,set_total]=useState(0);
   const [response,set_response]=useState();
+  const [total,set_total]=useState(0);
   const [inputs,set_inputs] = useState({
     500:0.0,
     200:0.0,
@@ -26,6 +27,7 @@ const InwentaryzacjaPage = () => {
    0.02:0.0,
    0.01:0.0,
   })
+
   function smallInputChangeHandler(event: ChangeEvent<HTMLInputElement>){
     let id = parseFloat(event.target.id.slice(6));
     let value = parseFloat(event.target.value);
@@ -38,12 +40,13 @@ const InwentaryzacjaPage = () => {
   }
   const calc_total = (newValues: { 500?: number; 200?: number; 100?: number; 50?: number; 20?: number; 10?: number; 5?: number; 2?: number; 1?: number; 0.5?: number; 0.2?: number; 0.1?: number; 0.05?: number; 0.02?: number; 0.01?: number}) => {
       let subvalueSum = 500*newValues[500]!+200*newValues[200]!+100*newValues[100]!+50*newValues[50]!+20*newValues[20]!+10*newValues[10]!+5*newValues[5]!+2*newValues[2]!+1*newValues[1]!+0.5*newValues[0.5]!+0.2*newValues[0.2]!+0.1*newValues[0.1]!+0.05*newValues[0.05]!+0.02*newValues[0.02]!+0.01*newValues[0.01]!
-      set_total(subvalueSum)
+      set_total(parseFloat(subvalueSum.toFixed(2)))
   }
     async function handleSubmit(event: FormEvent<HTMLFormElement>){
       event.preventDefault();
-      let json : any = {}
+      
     let inputelement = document.querySelectorAll("[id^='input-']");
+    let json:any = {}
     inputelement.forEach(temp => {
       //@ts-ignore
       let id= parseFloat(temp.id.slice(6));
@@ -60,12 +63,52 @@ const InwentaryzacjaPage = () => {
         content:JSON.stringify(json)
       }
     });
-
-    console.log(res.data)  
-        //@ts-ignore
-    set_response(JSON.stringify(res.data))
+      set_json(json)
+      set_response(res.data)
+      onOpen()
     }
     
+    async function handleImbalance(event: MouseEvent<HTMLButtonElement>) {
+        let json2 = {
+          //@ts-expect-error
+          [500]:json[500],
+          //@ts-expect-error
+          [200]:json[200],
+          //@ts-expect-error          
+          [100]:json[100],
+          //@ts-expect-error
+          [50]:json[50],
+          //@ts-expect-error
+          [20]:json[20],
+          //@ts-expect-error 
+          [10]:json[10],
+          //@ts-expect-error
+          [5]:json[5],
+          //@ts-expect-error
+          [2]:json[2],
+          //@ts-expect-error
+          [1]:json[1],
+          //@ts-expect-error
+          [0.5]:json[0.5],
+          //@ts-expect-error
+          [0.2]:json[0.2],
+          //@ts-expect-error
+          [0.1]:json[0.1],
+          //@ts-expect-error
+          [0.05]:json[0.05],
+          //@ts-expect-error
+          [0.02]:json[0.02],
+          //@ts-expect-error
+          [0.01]:json[0.01],
+        }
+        const res = await api.get('/fileaccess.php', {
+          params:{
+            ID:"set",
+            Mode:"silent",
+            content:JSON.stringify(json2)
+          }
+        });
+      }
       return(
         <>
           <Form
@@ -215,7 +258,6 @@ const InwentaryzacjaPage = () => {
             type="submit"
             color="secondary"
             value={"Zweryfikuj"}
-            onClick={onOpen}
             >
             </Input>
           
@@ -223,7 +265,7 @@ const InwentaryzacjaPage = () => {
            <Modal 
            isOpen={isOpen} 
            onOpenChange={onOpenChange} 
-           size="4xl"
+           size="2xl"
            className={`${
             darkMode.value ? '' : 'dark'
           } text-foreground`}
@@ -235,19 +277,50 @@ const InwentaryzacjaPage = () => {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">Weryfikacja ukończona</ModalHeader>
+              <ModalHeader className="flex flex-col gap-1">Weryfikacja ukończona (wartości ujemne - nadmiar, dodatnie - niedobór)</ModalHeader>
               <ModalBody>
-                  <Textarea value={response}></Textarea>
+              <div className="flex gap-1 justify-between place-content-evenly">
+                <div className="flex flex-col gap-1 justify-between place-content-evenly">
+                  <Chip>{"500 => " + (JSON.parse(JSON.stringify(response))[500])}</Chip>
+                  <Chip>{"200 => " + (JSON.parse(JSON.stringify(response))[200])}</Chip>
+                  <Chip>{"100 => " + (JSON.parse(JSON.stringify(response))[100])}</Chip>
+                </div>
+                <div className="flex flex-col gap-1 justify-between place-content-evenly">
+                  <Chip>{"50 => " + (JSON.parse(JSON.stringify(response))[50])}</Chip>
+                  <Chip>{"20 => " + (JSON.parse(JSON.stringify(response))[20])}</Chip>
+                  <Chip>{"10 => " + (JSON.parse(JSON.stringify(response))[10])}</Chip>
+                </div>
+                <div className="flex flex-col gap-1 justify-between place-content-evenly">
+                  <Chip>{"5 => " + (JSON.parse(JSON.stringify(response))[5])}</Chip>
+                  <Chip>{"2 => " + (JSON.parse(JSON.stringify(response))[2])}</Chip>
+                  <Chip>{"1 => " + (JSON.parse(JSON.stringify(response))[1])}</Chip>
+                </div>
+                <div className="flex flex-col gap-1 justify-between place-content-evenly">
+                  <Chip>{"0.5 => " + (JSON.parse(JSON.stringify(response))[0.5])}</Chip>
+                  <Chip>{"0.2 => " + (JSON.parse(JSON.stringify(response))[0.2])}</Chip>
+                  <Chip>{"0.1 => " + (JSON.parse(JSON.stringify(response))[0.1])}</Chip>
+                </div>
+                <div className="flex flex-col gap-1 justify-between place-content-evenly">
+                  <Chip>{"0.05 => " + (JSON.parse(JSON.stringify(response))[0.05])}</Chip>
+                  <Chip>{"0.02 => " + (JSON.parse(JSON.stringify(response))[0.02])}</Chip>
+                  <Chip>{"0.01 => " + (JSON.parse(JSON.stringify(response))[0.01])}</Chip>
+                </div>
+              </div>
+              <Card>
+                <CardBody className="text-center">
+                {"Różnica między stanem rzeczywistym a logicznym => " + Math.abs(parseFloat(JSON.parse(JSON.stringify(response))["diff"])).toFixed(2)}
+                </CardBody>
+              </Card>
               </ModalBody>
               <ModalFooter>
-                <Button color="primary" onPress={onClose}>
+                <Button color="primary" onPress={onClose} onClick={handleImbalance} isDisabled={parseFloat(parseFloat(JSON.parse(JSON.stringify(response))["diff"]).toFixed(2))>=0}>
                   Przekaż nadmiar na cele charytatywne
                 </Button>
-                <Button color="danger" onPress={onClose}>
+                <Button color="danger" onPress={onClose} onClick={handleImbalance} isDisabled={parseFloat(parseFloat(JSON.parse(JSON.stringify(response))["diff"]).toFixed(2))<=0}>
                   Potrąć z pensji pracownika
                 </Button>
-                <Button color="success" onPress={onClose}>
-                  Wyrównaj stany kas
+                <Button color="success" onPress={onClose} onClick={handleImbalance} isDisabled={parseFloat(parseFloat(JSON.parse(JSON.stringify(response))["diff"]).toFixed(2))!=0}>
+                  Wyrównaj stany / Akceptuj
                 </Button>
               </ModalFooter>
             </>
