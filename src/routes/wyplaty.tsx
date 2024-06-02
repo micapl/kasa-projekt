@@ -3,24 +3,27 @@ import { FormEvent, useState, useEffect, ChangeEvent } from "react";
 import { Form } from "react-router-dom";
 import api from "../api";
 
-let values: (string | undefined)[] = []
-let dataLoaded = false
 
-async function getKasaValues() {
-  try {
-      const response = await api.get('/fileaccess.php', {
-        params: {
-          ID: "state"
-        }
-    })
-      dataLoaded = true
-      values = response.data
-      console.log()
-  } catch (error) {
-      console.error(error);
-  }
-}
+let dataLoaded = false
+let values: (string | undefined)[] = []
+
 const WyplatyPage = () => {
+
+  async function getKasaValues() {
+    console.log("gettin")
+    try {
+        const response = await api.get('/fileaccess.php', {
+          params: {
+            ID: "state"
+          }
+      })
+        dataLoaded = true
+        values = response.data
+        console.log()
+    } catch (error) {
+        console.error(error);
+    }
+  }
   const [total,set_total]=useState(0);
   const [inputs,set_inputs] = useState({
     500:0.0,

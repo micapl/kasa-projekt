@@ -3,6 +3,7 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Credentials: true");
 header("Access-Control-Allow-Headers: X-Requested-With,Access-Control-Allow-Headers, Access-Control-Allow-Origin , Content-Type, Origin, Cache-Control, Pragma, Authorization, Accept, Accept-Encoding, access-control-allow-methods");
 header("Access-Control-Allow-Methods: PUT, POST, GET, OPTIONS, DELETE");
+date_default_timezone_set("Europe/Warsaw");
 
 $plik = fopen('kasa.txt','c+');
 fgetc($plik);
@@ -11,7 +12,6 @@ if (feof($plik)){
 }
 
 function logger($type,$message){
-    date_default_timezone_set("Europe/Warsaw");
     $date = date('c');
     $log = fopen('main.log','a');
     fwrite($log,$date." [".$type."]".$message."\n");
@@ -54,7 +54,6 @@ function loadFileData($file){
 }
 
 function withdraw($values, $file){
-    logger('debug',"Withdraw started");
     fseek($file,0);
     $deposit = JSON_decode($values, true);
     while (!feof($file)) {
@@ -65,7 +64,7 @@ function withdraw($values, $file){
     }
     writeFileData($file,$kasaArray);
     if(!isset($_GET["Mode"])){
-        logger("operation","Withdraw complete".$values);
+        logger("operation","Withdraw".$values);
     }
 }
 
@@ -80,13 +79,12 @@ function deposit($values, $file){
     }
     writeFileData($file,$kasaArray);
     if(!isset($_GET["Mode"])){
-        logger("operation","Deposit complete".$values);
+        logger("operation","Deposit ".$values);
     }
    
 }
 
 function verify($values, $file){
-    logger('debug',"Verifying logical and physical kasa state");
     fseek($file,0);
     //values - fizyczny (uzytkownik nam podal), file - logiczny
     $values = JSON_decode($values, true);
@@ -96,11 +94,68 @@ function verify($values, $file){
         if(!feof($file)){
             $physical += $values[$temp[0]]*$temp[0];
             $logical += $temp[1]*$temp[0];
-            $kasaArray[$temp[0]] = (string)($values[$temp[0]]-$temp[1]);
+            $kasaArray[$temp[0]] = ($values[$temp[0]]-$temp[1]);
         }
     }
-    $kasaArray["diff"] = (string)($physical-$logical);
+    logger('operation',"Verified".JSON_encode($kasaArray));
+    $kasaArray["diff"] = ($physical-$logical);
     return(JSON_encode($kasaArray));
+
+}
+
+function generateReport($data){
+    $i = 0;
+    $table = [];
+    $start = date_create();
+    $end = date_create();
+    $data = JSON_decode($data, true);
+    date_date_set(
+        $start,
+        $data["dates"]["start"]["year"],
+        $data["dates"]["start"]["month"],
+        $data["dates"]["start"]["day"]
+    );
+    date_date_set(
+        $end,
+        $data["dates"]["end"]["year"],
+        $data["dates"]["end"]["month"],
+        $data["dates"]["end"]["day"]
+    );
+    $options = $data["options"];
+    $log = fopen('main.log','r');
+    while (!feof($log)) {
+        if(!feof($log)){
+        $line = fgets($log);
+        $linedate = date_create();
+        $tempdate = explode('-',explode("T",$line)[0]);
+        date_date_set(
+            $linedate,
+            @(Int)($tempdate[0]),
+            @(Int)($tempdate[1]),
+            @(Int)($tempdate[2])
+        );
+        if ($linedate->getTimestamp() >= $start->getTimestamp() && $linedate->getTimestamp() <= $end->getTimestamp()){
+                $temp = JSON_decode(substr($line,45),true);
+                $sum = 0;
+                foreach ($temp as $key => $value) {
+                    $sum += $key*$value;
+                }
+                if(in_array(substr($line,37,8),$options)){
+                    $table[$i]['id'] = $i;
+                    $table[$i]["date"] = explode("T",$line)[0];
+                    $table[$i]["time"] = substr($line,11,8);
+                    $table[$i]["type"] = substr($line,37,8);
+                    $table[$i]["data"] = substr($line,45);
+                    $table[$i]["sum"] = $sum;
+                    $i++;
+                }
+
+          }
+          
+       
+    }
+    }
+    echo(JSON_encode($table));
 
 }
 
@@ -125,6 +180,8 @@ switch ($_GET["ID"]) {
     case "set":
         writeFileData($plik,JSON_decode($_GET["content"],true));
         break;
+    case "report":
+        echo(generateReport($_GET["content"]));
     default:
         break;
     }

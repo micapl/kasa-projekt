@@ -308,7 +308,7 @@ const InwentaryzacjaPage = () => {
               </div>
               <Card>
                 <CardBody className="text-center">
-                {"Różnica między stanem rzeczywistym a logicznym => " + Math.abs(parseFloat(JSON.parse(JSON.stringify(response))["diff"])).toFixed(2)}
+                {"Różnica między stanem rzeczywistym a logicznym => " + parseFloat(JSON.parse(JSON.stringify(response))["diff"]).toFixed(2)}
                 </CardBody>
               </Card>
               </ModalBody>
